@@ -14,10 +14,6 @@ TODO:
 #include "profiles.h"
 
 #include <Wire.h>
-// avr sleep instructions
-// #include <avr/sleep.h>
-// #include <avr/wdt.h>
-// #include <avr/power.h>
 
 #if defined DS18B20
    #include <OneWire.h>
@@ -38,7 +34,6 @@ TODO:
 #include <RFM69.h>
 #include <SPI.h>
 
-
  // Jee Ports
 #include <JeeLib.h>
 
@@ -55,12 +50,11 @@ TODO:
 //#include <EEPROM.h>
 #include "boards.h"
 
-#if defined RADIO_RFM69
-      RFM69 radio;
-#elif defined ENABLE_ATC && defined RADIO_RFM69
-      RFM69_ATC radio;
-#else
-      RFM12B radio;
+
+RFM69 radio;
+
+#if defined ENABLE_ATC
+  RFM69_ATC radio;
 #endif
 
 
@@ -96,7 +90,6 @@ byte numberOfDevices;
 int volts;
 byte receivedOK = 0;
 byte relay_eeprom_addr = 0;
-boolean requestACK = false;
 
 char buf[10];
 char buff[50];
@@ -280,18 +273,6 @@ void doReport()
     }
   }
   radio.sendWithRetry(GATEWAYID, nodeData, sizeof nodeData + 1);
-
-}
-
-static bool waitForAck(byte theNodeID)
-{
-  long now = millis();
-  while (millis() - now <= ACK_TIME)
-  {
-    if (radio.ACKReceived(theNodeID))
-      return true;
-  }
-  return false;
 }
 
 // void doReceive() {
